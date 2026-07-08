@@ -8,10 +8,13 @@ void USART3_Init(void) {
 	// Enable USART3
 	RCC->APB1ENR1 |= RCC_APB1ENR1_USART3EN;
 
+	// MSB first
+	USART3->CR2 |= USART_CR2_MSBFIRST;
+
 	// TODO: set the baudrate
 
 	// Enable USART, TX, and RX
-	USART3->CR1 |= ((0b1 << USART_CR1_TE_Pos) | (0b1 << USART_CR1_RE_Pos) | (0b1 << USART_CR1_UE_Pos));
+	USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE | USART_CR1_UE);
 }
 
 // TODO: error handle read/write
