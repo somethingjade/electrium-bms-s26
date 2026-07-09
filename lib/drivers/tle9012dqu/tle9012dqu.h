@@ -15,3 +15,4 @@
 #define CONFIG_ADDR 0x36
 
 uint8_t crc8_j1850(const uint8_t* data, size_t len);
+void TLE9012DQU_Init(uint8_t node_id);
