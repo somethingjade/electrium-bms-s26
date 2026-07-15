@@ -5,6 +5,10 @@ void GPIOA_Init(void) {
 	// Enable GPIOA
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
+	// Set PA0 to analog
+	GPIOA->MODER &= ~(GPIO_MODER_MODE0_Msk);
+	GPIOA->MODER |= (0b11 << GPIO_MODER_MODE0_Pos);
+
 	// TODO: init GPIOA for CAN
 }
 
