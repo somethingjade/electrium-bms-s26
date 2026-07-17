@@ -36,6 +36,8 @@
 #define BVM_START (0b1 << BVM_START_POS)
 #define PCVM_START (0b1 << PCVM_START_POS)
 
+#define NODE_ID 1 // maybe make this a param in the voltage sense functions instead
+
 
 uint8_t CRC8_J1850(const uint8_t* data, size_t len); 
 void TLE9012DQU_Send(const uint8_t* buf, size_t len); 
