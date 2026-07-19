@@ -1,0 +1,1 @@
+void BMS_Init();
