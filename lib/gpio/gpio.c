@@ -9,7 +9,13 @@ void GPIOA_Init(void) {
 	GPIOA->MODER &= ~(GPIO_MODER_MODE0_Msk);
 	GPIOA->MODER |= (0b11 << GPIO_MODER_MODE0_Pos);
 
-	// TODO: init GPIOA for CAN
+	// Set PA11 and PA12 to AF
+	GPIOA->MODER &= ~(GPIO_MODER_MODE11_Msk | GPIO_MODER_MODE12_Msk);
+	GPIOA->MODER |= ((0b10 << GPIO_MODER_MODE11_Pos) | (0b10 << GPIO_MODER_MODE12_Pos));
+
+	// Select AF9
+	GPIOA->AFR[1] &= ~(GPIO_AFRH_AFSEL11_Msk | GPIO_AFRH_AFSEL12_Msk);
+	GPIOA->AFR[1] |= ((0b1001 << GPIO_AFRH_AFSEL11_Pos) | (0b1001 << GPIO_AFRH_AFSEL12_Pos));
 }
 
 void GPIOB_Init(void) {
