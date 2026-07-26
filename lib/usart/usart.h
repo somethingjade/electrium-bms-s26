@@ -4,4 +4,4 @@
 
 void USART3_Init(void);
 void USART3_Read(uint8_t* buf, size_t len);
-void USART3_Write(const uint8_t* buf, size_t len, bool waitForEnd);
+void USART3_Write(const uint8_t* buf, size_t len, bool wait_for_end);

@@ -25,12 +25,12 @@ void USART3_Read(uint8_t* buf, size_t len) {
 	}
 }
 
-void USART3_Write(const uint8_t* buf, size_t len, bool waitForEnd) {
+void USART3_Write(const uint8_t* buf, size_t len, bool wait_for_end) {
 	for (size_t i = 0; i < len; ++i) {
 		while (!(USART3->ISR & USART_ISR_TXE_Msk)) {}
 		USART3->TDR = buf[i];
 	}
-	if (waitForEnd) {
+	if (wait_for_end) {
 		while (!(USART3->ISR & USART_ISR_TC_Msk)) {}
 	}
 }
