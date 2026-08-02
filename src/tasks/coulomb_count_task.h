@@ -1,1 +1,0 @@
-void vCoulombCountTask(void* pvParameters);

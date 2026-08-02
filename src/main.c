@@ -1,5 +1,5 @@
 #include <init.h>
-#include "tasks/coulomb_count_task.h"
+#include "tasks/soc_task.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -9,8 +9,8 @@
 int main(void) {
 	BMS_Init();
 	xTaskCreate(
-		vCoulombCountTask,
-		"Coulomb Count",
+		vSOCTask,
+		"SOC",
 		STACK_SIZE,
 		NULL,
 		tskIDLE_PRIORITY + 1,
