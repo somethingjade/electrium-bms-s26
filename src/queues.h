@@ -1,4 +1,4 @@
-#include "FreeRTOS.h";
+#include "FreeRTOS.h"
 #include "queue.h"
 
 extern QueueHandle_t soc_queue;

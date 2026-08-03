@@ -4,11 +4,14 @@
 #include <coulomb_count.h>
 #include "task.h"
 #include "sensors/current/current.h"
+#include "sensors/voltage/voltage.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <tle9012dqu.h>
-#include "soc_task.h"
+#include "soc.h"
+#include "ocv_lookup.h"
+#include "queues.h"
 
 // TODO: actual capacity
 // probably cant just be a define
@@ -44,8 +47,10 @@ void vSOCTask(void* pvParameters) {
 		for (size_t i = 0; i < CELLS; ++i) {
 			soc[i] = CoulombCount_SOC(soc[i], current, CAPACITY, dt);
 			if (use_ocv) {
-				// TODO: lookup
+				float v = ReadVoltage(i);
+				soc[i] = 0.98*soc[i] + 0.02*ocv_lookup(v);
 			}
+		xQueueSend(soc_queue, soc + i, portMAX_DELAY);
 		}
 		vTaskDelayUntil(&last_wake_time, period);
 	}
