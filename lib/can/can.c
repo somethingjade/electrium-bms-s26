@@ -24,6 +24,8 @@ void CAN1_Init() {
 	CAN1->FMR &= ~(CAN_FMR_FINIT);
 	CAN1->MCR &= ~(CAN_MCR_INRQ);
 	while (CAN1->MSR & CAN_MSR_INAK_Msk) {}
+	CAN1->IER |= CAN_IER_FMPIE0;
+	NVIC_EnableIRQ(CAN1_RX0_IRQn);
 }
 
 void CAN1_Transmit(uint16_t id, uint8_t dlc, uint64_t data, bool wait_for_completion) {
@@ -73,4 +75,12 @@ bool CAN1_Receive(uint16_t* p_id, uint8_t* p_dlc, uint64_t* p_data) {
 		return true;
 	}
 	return false;
+}
+
+void CAN1_RX0_IRQHandler() {
+	uint16_t id = 0;
+	uint8_t dlc = 0;
+	uint64_t data = 0;
+	if (CAN1_Receive(&id, &dlc, &data)) {
+	}
 }
