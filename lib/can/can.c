@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stm32l4xx.h>
 #include "can.h"
+#include "portmacro.h"
+#include "queues.h"
 
 void CAN1_Init() {
 	// Enable CAN1
@@ -62,15 +64,15 @@ void CAN1_Transmit(uint16_t id, uint8_t dlc, uint64_t data, bool wait_for_comple
 }
 
 // everything on fifo 0 for now
-bool CAN1_Receive(uint16_t* p_id, uint8_t* p_dlc, uint64_t* p_data) {
+bool CAN1_Receive(CANDataFrame* p_data) {
 	if (CAN1->RF0R & CAN_RF0R_FMP0_Msk) {
 		uint16_t id = CAN1->sFIFOMailBox[0].RIR >> CAN_RI0R_STID_Pos;
 		uint8_t dlc = CAN1->sFIFOMailBox[0].RDTR & CAN_RDT0R_DLC_Msk;
 		uint32_t low = CAN1->sFIFOMailBox[0].RDLR;
 		uint32_t high = CAN1->sFIFOMailBox[0].RDHR;
-		*p_id = id;
-		*p_dlc = dlc;
-		*p_data = ((uint64_t)high << 32) | low;
+		p_data->id = id;
+		p_data->dlc = dlc;
+		p_data->data = ((uint64_t)high << 32) | low;
 		CAN1->RF0R |= CAN_RF0R_RFOM0;
 		return true;
 	}
@@ -78,9 +80,8 @@ bool CAN1_Receive(uint16_t* p_id, uint8_t* p_dlc, uint64_t* p_data) {
 }
 
 void CAN1_RX0_IRQHandler() {
-	uint16_t id = 0;
-	uint8_t dlc = 0;
-	uint64_t data = 0;
-	if (CAN1_Receive(&id, &dlc, &data)) {
+	CANDataFrame data = {};
+	if (CAN1_Receive(&data)) {
+		xQueueSend(can_recv_queue, &data, portMAX_DELAY);
 	}
 }

@@ -26,8 +26,16 @@ void vSOCTask(void* pvParameters) {
 	const TickType_t idle_ticks = pdMS_TO_TICKS(THRESHOLD_MS);
 	// TODO: actual SOC init
 	float soc[CELLS] = {};
+	float soc_start[CELLS] = {};
+	float soh[CELLS] = {};
+	float capacity[CELLS] = {};
+	float q[CELLS];
 	for (size_t i = 0; i < CELLS; ++i) {
 		soc[i] = 1.0;
+		soc_start[i] = 1.0;
+		soh[i] = 1.0;
+		capacity[i] = CAPACITY;
+		q[i] = 0.0;
 	}
 	float current = 0.0;
 	bool use_ocv = false;
@@ -45,12 +53,22 @@ void vSOCTask(void* pvParameters) {
 			idle_start_time = now;
 		}
 		for (size_t i = 0; i < CELLS; ++i) {
-			soc[i] = CoulombCount_SOC(soc[i], current, CAPACITY, dt);
+			q[i] += current*dt;
+			soc[i] = CoulombCount_SOC(soc[i], current, capacity[i], dt);
 			if (use_ocv) {
 				float v = ReadVoltage(i);
-				soc[i] = 0.98*soc[i] + 0.02*ocv_lookup(v);
+				float soc_ocv = ocv_lookup(v);
+				soc[i] = 0.98*soc[i] + 0.02*soc_ocv;
+				if (soc_start[i] - soc_ocv > SOH_SOC_DELTA_THRESHOLD) {
+					float c_new = q[i]/(soc_start[i] - soc_ocv);
+					capacity[i] = 0.98*capacity[i] + 0.02*c_new;
+					soh[i] = capacity[i]/CAPACITY;
+				}
+				q[i] = 0.0;
+				soc_start[i] = soc[i];
 			}
-		xQueueSend(soc_queue, soc + i, portMAX_DELAY);
+			xQueueSend(soc_queue, soc + i, portMAX_DELAY);
+			xQueueSend(soh_queue, soh + i, portMAX_DELAY);
 		}
 		vTaskDelayUntil(&last_wake_time, period);
 	}
