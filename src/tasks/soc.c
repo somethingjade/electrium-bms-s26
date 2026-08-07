@@ -67,9 +67,10 @@ void vSOCTask(void* pvParameters) {
 				q[i] = 0.0;
 				soc_start[i] = soc[i];
 			}
-			xQueueSend(soc_queue, soc + i, portMAX_DELAY);
-			xQueueSend(soh_queue, soh + i, portMAX_DELAY);
 		}
+		// xQueueSend(soc_queue, soc, portMAX_DELAY);
+		// xQueueSend(soh_queue, soh, portMAX_DELAY);
+		xQueueOverwrite(latest_soc_queue, soc);
 		vTaskDelayUntil(&last_wake_time, period);
 	}
 }

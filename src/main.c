@@ -1,5 +1,6 @@
 #include <init.h>
 #include "tasks/soc.h"
+#include "tasks/balancing.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queues.h"
@@ -13,6 +14,14 @@ int main(void) {
 	xTaskCreate(
 		vSOCTask,
 		"SOC",
+		STACK_SIZE,
+		NULL,
+		tskIDLE_PRIORITY + 1,
+		NULL
+	);
+	xTaskCreate(
+		vBalancingTask,
+		"Balancing",
 		STACK_SIZE,
 		NULL,
 		tskIDLE_PRIORITY + 1,
